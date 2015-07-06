@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="theme-color" content="#eee">
+    <meta name="viewport" content="width=device-width">
+    <style>
+      body { font: 1.5em/1.5 monospace; }
+      nav a { display: block; }
+      #clearButton { color: #666; cursor: pointer; font-size: 1em; margin-bottom: 1em; }
+      #logs { border-bottom: 1px dashed blue; margin-bottom: 1.5em; font-size: .8em; padding-bottom: 1em; }
+    </style>
+  </head>
+  <body>
+    <button id="clearButton">clear logs</button>
+    <nav>
+      <a href="viewmode_mono.html">viewmode=mono</a>
+      <a href="viewmode_stereo.html">viewmode=stereo</a>
+      <a href="viewmode_undefined.html">viewmode=undefined</a>
+    </nav>
+    <ol id="logs"></ol>
+    <iframe width="100%" id="iframe" name="iframe" src="viewmode_undefined.html" mozbrowser remote></iframe>
+    <script src="browser.js"></script>
+  </body>
+</html>

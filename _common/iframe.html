@@ -1,0 +1,22 @@
+<iframe id="iframe1" src="http://marketplace.firefox.com" width="100%"></iframe>
+<iframe id="iframe2" src="long.html" width="100%"></iframe>
+
+<script>
+var i = 100;
+
+setInterval(function () {
+  try {
+    iframe1.contentWindow.window.scrollTo(0, i += 50);
+  } catch(e) {
+    // console.log('caught', e);
+  }
+}, 1000);
+
+setInterval(function () {
+  try {
+    iframe2.contentWindow.window.scrollTo(0, i += 50);
+  } catch(e) {
+    // console.log('caught', e);
+  }
+}, 1000);
+</script>

@@ -1,0 +1,28 @@
+<html><head>
+  <meta charset="UTF-8">
+  <title>Horizon</title>
+  <link rel="stylesheet" href="css/navigation.css">
+  <link rel="stylesheet" href="css/font-awesome.css">
+  <script defer="" src="js/main.js"></script>
+</head>
+<body data-frame-pointer-events="none">
+
+  <!-- fullscreen container which VR fullscreen is applied to -->
+  <div style="animation: 0.5s ease 0s normal forwards 1 running fs-container-lighten;" id="fs-container">
+    <!-- container acting as camera -->
+    <div style="" id="camera" class="camera threed" style="transform-origin: 0 0 0">
+
+      <!-- <div class="container__cover threed"></div> -->
+      <div style="animation: 0.3s ease 0s normal forwards 1 running container-pullForward;" id="container--mono" class="container--mono threed" style="height: 500px; width: 500px; ">
+
+      <!-- browser content iframes -->
+      <iframe style="transform: translateX(0px) perspective(1000px) rotateY(0deg);" class="frame--mono threed" remote="true" mozbrowser="true" src="long.html"></iframe></div>
+
+    </div>
+  </div>
+
+  <button id="entervr" class="btn btn--entervr">Enter VR</button>
+
+
+
+</body></html>

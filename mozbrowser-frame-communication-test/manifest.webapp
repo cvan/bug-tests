@@ -1,0 +1,14 @@
+{
+  "name": "mozbrowser-test",
+  "description": "Mozbrowser Test",
+  "launch_path": "/mozbrowser-parent.html",
+  "type": "privileged",
+  "role": "system",
+  "developer": {
+    "name": "Mozilla",
+    "url": "https://mozilla.org"
+  },
+  "permissions": {
+    "browser": {}
+  }
+}

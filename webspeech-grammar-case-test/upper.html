@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>webspeech-grammar-case-test: uppercase</title>
+  </head>
+  <body>
+    <script>
+(function () {
+
+/*
+
+Firefox logs:
+
+–
+
+INFO: jsgf.c(691): Defined rule: PUBLIC <test.simple>
+INFO: fsg_model.c(215): Computing transitive closure for null transitions
+INFO: fsg_model.c(277): 0 null transitions added
+INFO: fsg_search.c(227): FSG(beam: -1080, pbeam: -1080, wbeam: -634; wip: -26, pip: 0)
+ERROR: "fsg_search.c", line 142: The word 'Hello' is missing in the dictionary
+
+*/
+
+var words = ['Hello'];
+
+var grammar = `#JSGF V1.0; grammar test; public <simple> = ${words.join(' | ')} ;`;
+
+new SpeechGrammarList().addFromString(grammar, 1);
+
+})();
+    </script>
+  </body>
+</html>

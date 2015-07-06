@@ -1,0 +1,15 @@
+{
+  "name": "mozbrowser-events-tests",
+  "description": "mozbrowser events tests",
+  "launch_path": "/browser.html",
+  "type": "privileged",
+  "role": "system",
+  "developer": {
+    "name": "Mozilla",
+    "url": "https://mozilla.org"
+  },
+  "permissions": {
+    "browser": {},
+    "embed-apps": {}
+  }
+}

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>VR Mode Scrolling with iframes — bug test case for Firefox</title>
+    <style>
+      html { font-size: 12px; }
+      body { background: red; color: #333; font: 2rem monospace; margin: 2em; }
+      #fsButton { color: hotpink; cursor: pointer; font-size: 2rem; padding: 1rem; position: fixed; top: 1rem; right: 1rem; }
+      /*iframe { transform: rotateY(30deg) translate3d(0,0,0); }*/
+
+      #camera {
+        transform-origin: 0 0 0;
+      }
+
+      #world {
+        transform: translate3d(0, 0, 0);
+      }
+
+      .threed {
+        transform-style: preserve-3d;
+        position: absolute;
+        top: 0; left: 0;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div id="container" class="container">
+      <div id="camera" class="threed">
+        <div id="world" class="threed">
+          <iframe id="iframe" src="long.html" width="100%" height="100%" mozbrowser remote class="threed"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <button id="fsButton" onclick="goFullscreen()">Fullscreen</button>
+
+    <script>
+
+      window.addEventListener('load', function () {
+        document.addEventListener('keypress', onkey);
+
+        if (navigator.getVRDevices) {
+          navigator.getVRDevices().then(vrDeviceCallback);
+        }
+      });
+
+      var vrHMD;
+      var vrSensor;
+
+      function vrDeviceCallback(vrdevs) {
+        for (var i = 0; i < vrdevs.length; ++i) {
+          if (vrdevs[i] instanceof HMDVRDevice) {
+            vrHMD = vrdevs[i];
+            break;
+          }
+        }
+
+        if (!vrHMD) {
+          return;
+        }
+
+        // Then, find that HMD's position sensor.
+        for (var i = 0; i < vrdevs.length; ++i) {
+          if (vrdevs[i] instanceof PositionSensorVRDevice &&
+              vrdevs[i].hardwareUnitId === vrHMD.hardwareUnitId)
+          {
+            vrSensor = vrdevs[i];
+            break;
+          }
+        }
+
+        if (!vrSensor) {
+          alert("Found a HMD, but didn't find its orientation sensor");
+        }
+      }
+
+      function goFullscreen() {
+        if (!vrSensor) {
+          alert('Connect your HMD!');
+          throw 'HMD not connected!';
+        }
+
+        vrSensor.resetSensor();
+        container.mozRequestFullScreen({vrDisplay: vrHMD});
+
+        console.log('Opening fullscreen on container', container);
+      }
+
+      function onkey(e) {
+        if (e.shiftKey || e.metaKey) {
+          return;
+        }
+
+        if (e.charCode) {
+          switch (String.fromCharCode(e.charCode)) {
+            case 'f':
+              goFullscreen();
+              break;
+            case 'z':
+              vrSensor.resetSensor();
+              break;
+            default:
+              return;
+          }
+
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+      }
+    </script>
+  </body>
+</html>

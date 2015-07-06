@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>CSS-VR scrolling test w/ an &lt;iframe&gt;</title>
+    <style type="text/css">
+body {
+  overflow: hidden;
+}
+
+#fsButton { color: hotpink; cursor: pointer; font-size: 2rem; padding: 1rem; position: fixed; top: 1rem; right: 1rem; }
+
+#container:not(:-moz-full-screen) {
+  transform: translate(300px, 300px);
+}
+
+.threed {
+  left: 0;
+  position: absolute;
+  top: 0;
+  transform-style: preserve-3d;
+}
+
+#camera {
+  transform-origin: 0 0 0;
+}
+
+.pane {
+  height: 600px;
+  width: 400px;
+  overflow: hidden;
+}
+
+#pane {
+  background: green;
+  transform: translate(-200px, -300px) rotateY(0deg) translate3d(0, 0, -750px);
+}
+
+#world {
+  transform: translate3d(0, 0, 0);
+}
+
+@keyframes spin {
+  0% { transform: translateY(200px) rotateY(360deg); }
+  50% { transform: translateY(200px) rotateY(180deg); }
+  100% { transform: translateY(200px) rotateY(0deg); }
+}
+
+#anim {
+  animation: spin 5s linear infinite;
+}
+
+#instructions {
+  color: hotpink;
+  font: 36px Helvetica, sans-serif;
+  transform: translate(-10px, -15px) translate3d(0, 0, -350px);
+}
+    </style>
+  </head>
+  <body>
+    <!-- This is a containing element that will be made fullscreen. -->
+    <div id="cssContainer" class="container">
+      <!-- This is an inner element that will serve as a camera, moving its children around in the scene.
+           This and all its children will have transform-style: preserve-3d set via the class, as well as
+           transform-origin set to 0,0 -->
+      <div id="cssCamera" class="threed">
+        <div id="world" class="threed">
+          <div id="pane" class="threed pane">
+            <div>
+              <p>some other element that is not an iframe</p>
+              <iframe id="iframe" class="pane" scrolling="no" seamless src="child.html"></iframe>
+            </div>
+          </div>
+          <div id="anim" class="threed">
+            <div id="instructions" class="threed pane">press S to scroll iframe</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button id="fsButton">Fullscreen</button>
+
+    <script>
+function matrixFromQuaternion(x, y, z, w)
+{
+  var m = Array(16);
+
+  var x2 = x + x, y2 = y + y, z2 = z + z;
+  var xx = x * x2, xy = x * y2, xz = x * z2;
+  var yy = y * y2, yz = y * z2, zz = z * z2;
+  var wx = w * x2, wy = w * y2, wz = w * z2;
+
+  m[0] = 1 - (yy + zz);
+  m[4] = xy - wz;
+  m[8] = xz + wy;
+
+  m[1] = xy + wz;
+  m[5] = 1 - (xx + zz);
+  m[9] = yz - wx;
+
+  m[2] = xz - wy;
+  m[6] = yz + wx;
+  m[10] = 1 - (xx + yy);
+
+  m[3] = m[7] = m[11] = 0;
+  m[12] = m[13] = m[14] = 0;
+  m[15] = 1;
+
+  return m;
+}
+
+function cssMatrixFromElements(e)
+{
+  return "matrix3d(" + e.join(",") + ")";
+}
+
+function cssMatrixFromOrientation(q)
+{
+  if (!q)
+    return "";
+  // Note the -Y here, to account for CSS Y orientation
+  return cssMatrixFromElements(matrixFromQuaternion(q.x, -q.y, q.z, q.w));
+}
+
+
+var cssCameraPositionTransform = '';
+var currentOrientation;
+var vrHMD;
+var vrSensor;
+
+function frameCallback() {
+  window.requestAnimationFrame(frameCallback);
+
+  var state = vrSensor.getState();
+  currentOrientation = state.orientation;
+  var cssStateMatrix = cssMatrixFromOrientation(currentOrientation);
+
+  if (state.position) {
+    var p = state.position;
+    var tx = " translate3d(" + (-p.x*100.0) + "cm, " + (p.y*100.0) + "cm, " + (-p.z*100.0) + "cm) ";
+    cssStateMatrix += tx;
+  }
+
+  cssCamera.style.transform = cssCameraPositionTransform + " " + cssStateMatrix;
+}
+
+function vrDeviceCallback(vrdevs) {
+  for (var i = 0; i < vrdevs.length; ++i) {
+    if (vrdevs[i] instanceof HMDVRDevice) {
+      vrHMD = vrdevs[i];
+      break;
+    }
+  }
+
+  if (!vrHMD) {
+    return;
+  }
+
+  // Then, find that HMD's position sensor.
+  for (var i = 0; i < vrdevs.length; ++i) {
+    if (vrdevs[i] instanceof PositionSensorVRDevice &&
+        vrdevs[i].hardwareUnitId == vrHMD.hardwareUnitId)
+    {
+      vrSensor = vrdevs[i];
+      break;
+    }
+  }
+
+  if (!vrSensor) {
+    alert("Found a HMD, but didn't find its orientation sensor?");
+  }
+
+  // kick off rendering
+  requestAnimationFrame(frameCallback);
+}
+
+function goFullscreen() {
+  vrSensor.resetSensor();
+  cssContainer.mozRequestFullScreen({vrDisplay: vrHMD});
+}
+
+function onkey(e) {
+  if (e.charCode) {
+    switch (String.fromCharCode(e.charCode)) {
+      case 'f':
+        goFullscreen();
+        break;
+      case 'z':
+        vrSensor.resetSensor();
+        break;
+      case 's':
+        iframe.contentWindow.postMessage('scroll', '*');
+        console.log('[parent] postMessaged to iframe child');
+
+        // iframe.contentWindow.document.documentElement.scrollTop += iframe.contentWindow.document.documentElement.scrollHeight / 50;
+        break;
+      default:
+        return;
+    }
+
+    e.preventDefault();
+    e.stopPropagation();
+    return;
+  }
+
+  e.preventDefault();
+  e.stopPropagation();
+}
+
+function init() {
+  if (navigator.getVRDevices) {
+    navigator.getVRDevices().then(vrDeviceCallback);
+  }
+}
+
+window.addEventListener('keypress', onkey);
+window.addEventListener('load', init);
+fsButton.addEventListener('click', goFullscreen);
+iframe.addEventListener('load', function () {
+  console.log('[parent] iframe child loaded');
+});
+    </script>
+  </body>
+</html>
