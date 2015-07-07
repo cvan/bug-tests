@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>webspeech-grammar-case-test: number</title>
+  </head>
+  <body>
+    <script>
+(function () {
+
+/*
+
+Firefox logs:
+
+–
+
+INFO: jsgf.c(691): Defined rule: PUBLIC <test.simple>
+INFO: fsg_model.c(215): Computing transitive closure for null transitions
+INFO: fsg_model.c(277): 0 null transitions added
+INFO: fsg_search.c(227): FSG(beam: -1080, pbeam: -1080, wbeam: -634; wip: -26, pip: 0)
+INFO: fsg_model.c(428): Adding silence transitions for <sil> to FSG
+INFO: fsg_model.c(448): Added 2 silence word transitions
+INFO: fsg_model.c(428): Adding silence transitions for <sil> to FSG
+INFO: fsg_model.c(448): Added 2 silence word transitions
+INFO: fsg_model.c(428): Adding silence transitions for [NOISE] to FSG
+INFO: fsg_model.c(448): Added 2 silence word transitions
+INFO: fsg_search.c(174): Added 1 alternate word transitions
+INFO: fsg_lextree.c(110): Allocated 172 bytes (0 KiB) for left and right context phones
+INFO: fsg_lextree.c(256): 12 HMM nodes in lextree (6 leaves)
+INFO: fsg_lextree.c(259): Allocated 1728 bytes (1 KiB) for all lextree nodes
+INFO: fsg_lextree.c(262): Allocated 864 bytes (0 KiB) for lextree leafnodes
+0x110b22900 SetInRuleProcessorCache 0
+1436226340707  addons.update-checker  WARN  Update manifest for {972ce4c6-7e08-4474-a285-3208198ce6fd} did not contain an updates property
+0x11da415f0 SetInRuleProcessorCache 1
+0x110b22660 SetInRuleProcessorCache 1
+0x127b7f510 SetInRuleProcessorCache 1
+0x11da415f0 SetInRuleProcessorCache 0
+0x127b7f510 SetInRuleProcessorCache 0
+0x110b22660 SetInRuleProcessorCache 0
+0x11ca99f90 SetInRuleProcessorCache 1
+0x11d1350b0 SetInRuleProcessorCache 1
+INFO: jsgf.c(691): Defined rule: PUBLIC <test.simple>
+INFO: fsg_model.c(215): Computing transitive closure for null transitions
+INFO: fsg_model.c(277): 0 null transitions added
+INFO: fsg_search.c(227): FSG(beam: -1080, pbeam: -1080, wbeam: -634; wip: -26, pip: 0)
+ERROR: "fsg_search.c", line 142: The word '1' is missing in the dictionary
+
+*/
+
+var words = ['1'];
+
+var grammar = `#JSGF V1.0; grammar test; public <simple> = ${words.join(' | ')} ;`;
+
+new SpeechGrammarList().addFromString(grammar, 1);
+
+})();
+    </script>
+  </body>
+</html>
